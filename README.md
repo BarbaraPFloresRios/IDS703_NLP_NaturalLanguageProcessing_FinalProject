@@ -1,4 +1,5 @@
-# Final Project NLP: "Decoding Austen: Distinguishing Novels from Fanfiction"
+# "Decoding Austen: Exploring Document Classification to Distinguish Novels from Fanfiction"
+Austen or Fiction: Document Classification Challenge
 
 <img src="https://dhjhkxawhe8q4.cloudfront.net/harperfocus-wp/wp-content/uploads/sites/4/2023/07/20174052/Austen-Sense-and-Sensibility-detail1-web.jpg" alt="Descripción opcional" style="width: 100%; height: auto;">
 
