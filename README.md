@@ -17,6 +17,7 @@ In this project, we will delve into document classification through various stra
 
 #### Naive Bayes Approach: Exploring Document Classification Through Generative Probabilistic Modeling
 
+In this initial stage, we will delve into the utilization of a generative probabilistic model, specifically, the Naive Bayes algorithm, to carry out this classification task. We will explore how this algorithm can effectively discern between the distinctive features of Jane Austen's original works and the creative interpretations found in fan fiction.
 
 
 
