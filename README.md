@@ -10,6 +10,14 @@ Shaila Güereca
 Bárbara Flores
 
 
-#### Project Introduction
+#### Introduction
+
+In this project, we will delve into document classification through various strategies. Our focus is specifically on identifying whether a document belongs to an original work by Jane Austen or if it is a fanfiction based on the author's works. Our strategies to address the problem were developed as follows:
+
+
+#### Naive Bayes Approach: Exploring Document Classification Through Generative Probabilistic Modeling
+
+
+
 
 
