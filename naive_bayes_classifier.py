@@ -74,6 +74,11 @@ def build_vocabulary(h0_documents, h1_documents):
 
 
 def train_naive_bayes(X_train, y_train):
+    # ph0: Probability of class 0
+    # ph1: Probability of class 1
+    # p0: Matrix of probabilities for each token in the vocabulary given class 0
+    # p1: Matrix of probabilities for each token in the vocabulary given class 1
+
     h0_documents = X_train[y_train == 0]
     h1_documents = X_train[y_train == 1]
 
@@ -113,6 +118,22 @@ def test_naive_bayes(X_test, y_test, ph0, ph1, p0, p1):
     return num_correct / len(y_test)
 
 
+def generate_synthetic_data(
+    num_sentences, num_words_per_sentence, ph, p, vocabulary_map
+):
+    inverted_vocabulary_map = {v: k for k, v in vocabulary_map.items()}
+    documents = []
+    for i in range(num_sentences):
+        sentence = []
+        for j in range(num_words_per_sentence):
+            word_id = np.random.choice(np.arange(len(p0)), p=p0)
+            word = inverted_vocabulary_map[word_id]
+            sentence.append(word)
+        documents.append(sentence)
+
+    return documents
+
+
 austen = nltk.corpus.gutenberg.sents("austen-sense.txt")
 carroll = nltk.corpus.gutenberg.sents("carroll-alice.txt")
 
@@ -124,13 +145,28 @@ X_train, y_train, X_test, y_test = generate_data_token_counts(austen, carroll)
 
 
 # Train Naive Bayes
-ph0, ph1, p0, p1 = train_naive_bayes(X_train, y_train)
 
+ph0, ph1, p0, p1 = train_naive_bayes(X_train, y_train)
+# ph0: Probability of class 0
+# ph1: Probability of class 1
+# p0: Matrix of probabilities for each token in the vocabulary given class 0
+# p1: Matrix of probabilities for each token in the vocabulary given class 1
 
 # Test Naive Bayes
 print("Naive Bayes (train):", test_naive_bayes(X_train, y_train, ph0, ph1, p0, p1))
 print("Naive Bayes (test):", test_naive_bayes(X_test, y_test, ph0, ph1, p0, p1))
 
 # Create synthetic data:
-num_words_per_sentence = 10
-num_sentences = 100
+
+
+num_sentences = 15
+num_words_per_sentence = 7
+ph = ph0  # Austen: ph0, Carrol: ph1
+p = p0  # Austen: p0, Carrol: p1
+
+
+documents = generate_synthetic_data(
+    num_sentences, num_words_per_sentence, ph, p, vocabulary_map
+)
+for sentence in documents:
+    print(sentence)
