@@ -20,5 +20,7 @@ In this project, we will delve into document classification through various stra
 In this initial stage, we will delve into the utilization of a generative probabilistic model, specifically, the Naive Bayes algorithm, to carry out this classification task. We will explore how this algorithm can effectively discern between the distinctive features of Jane Austen's original works and the creative interpretations found in fan fiction. The code developed to implement this model is located in the [naive_bayes_classifier.py](https://github.com/BarbaraPFloresRios/IDS703_NLP_NaturalLanguageProcessing_FinalProject/blob/main/naive_bayes_classifier.py) file.
 
 
+https://docs.google.com/document/d/1EORv01E7TLXM8bz2m6CcyF612Long-x7/edit
+
 
 
