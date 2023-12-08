@@ -17,4 +17,4 @@ The objective of this study is to classify documents, distinguishing between the
 
 #### Requirements
 
-To run this project, it is necessary to..."
+To run this project, it is necessary to...
