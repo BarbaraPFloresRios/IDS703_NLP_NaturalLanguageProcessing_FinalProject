@@ -1,7 +1,6 @@
 """Compare token/document vectors for classification."""
 import random
 from typing import Mapping, Optional, Sequence
-
 import nltk
 import numpy as np
 from numpy.typing import NDArray
@@ -122,15 +121,15 @@ def generate_synthetic_data(num_sentences, num_words_per_sentence, p, vocabulary
     inverted_vocabulary_map = {v: k for k, v in vocabulary_map.items()}
     documents = []
     for i in range(num_sentences):
-        sentence = []
-        for j in range(num_words_per_sentence):
-            word_id = np.random.choice(len(p), p=p)
-            word = inverted_vocabulary_map[word_id]
-            sentence.append(word)
+        sentence = [
+            inverted_vocabulary_map[np.random.choice(len(p), p=p)]
+            for _ in range(num_words_per_sentence)
+        ]
         documents.append(sentence)
     return documents
 
 
+#
 h0_documents = nltk.corpus.gutenberg.sents("shakespeare-hamlet.txt")
 h1_documents = nltk.corpus.gutenberg.sents("bible-kjv.txt")
 
