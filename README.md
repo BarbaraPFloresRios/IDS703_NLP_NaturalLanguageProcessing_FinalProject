@@ -1,6 +1,6 @@
-## Decoding Austen: Exploring Document Classification to Distinguish Novels from Fanfiction
+## Textual Crossroads: Classifying Documents between the Bible and Hamlet
 
-<img src="https://dhjhkxawhe8q4.cloudfront.net/harperfocus-wp/wp-content/uploads/sites/4/2023/07/20174052/Austen-Sense-and-Sensibility-detail1-web.jpg" alt="Descripción opcional" style="width: 100%; height: auto;">
+<img src="https://t4.ftcdn.net/jpg/03/32/63/37/360_F_332633731_eL5iv27kZRe6p8J8bqQtIOV4XYV5mkdH.jpg" alt="Descripción opcional" style="width: 100%; height: auto;">
 
 
 Daniela Jiménez
