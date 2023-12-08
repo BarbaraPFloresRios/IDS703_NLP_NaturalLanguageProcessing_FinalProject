@@ -1,11 +1,11 @@
 """Compare token/document vectors for classification."""
 import random
-from typing import List, Mapping, Optional, Sequence
+from typing import Mapping, Optional, Sequence
 
 import nltk
 import numpy as np
 from numpy.typing import NDArray
-from sklearn.linear_model import LogisticRegression
+
 
 FloatArray = NDArray[np.float64]
 
@@ -67,7 +67,7 @@ def generate_data_token_counts(
 
 def build_vocabulary(h0_documents, h1_documents):
     vocabulary = sorted(
-        set(token for sentence in austen + carroll for token in sentence)
+        set(token for sentence in h0_documents + h1_documents for token in sentence)
     ) + [None]
     vocabulary_map = {token: idx for idx, token in enumerate(vocabulary)}
     return vocabulary_map
@@ -118,34 +118,29 @@ def test_naive_bayes(X_test, y_test, ph0, ph1, p0, p1):
     return num_correct / len(y_test)
 
 
-def generate_synthetic_data(
-    num_sentences, num_words_per_sentence, ph, p, vocabulary_map
-):
+def generate_synthetic_data(num_sentences, num_words_per_sentence, p, vocabulary_map):
     inverted_vocabulary_map = {v: k for k, v in vocabulary_map.items()}
     documents = []
     for i in range(num_sentences):
         sentence = []
         for j in range(num_words_per_sentence):
-            word_id = np.random.choice(np.arange(len(p0)), p=p0)
+            word_id = np.random.choice(len(p), p=p)
             word = inverted_vocabulary_map[word_id]
             sentence.append(word)
         documents.append(sentence)
-
     return documents
 
 
-austen = nltk.corpus.gutenberg.sents("austen-sense.txt")
-carroll = nltk.corpus.gutenberg.sents("carroll-alice.txt")
-
-h0_documents = austen
-h1_documents = carroll
+h0_documents = nltk.corpus.gutenberg.sents("shakespeare-hamlet.txt")
+h1_documents = nltk.corpus.gutenberg.sents("bible-kjv.txt")
 
 vocabulary_map = build_vocabulary(h0_documents, h1_documents)
-X_train, y_train, X_test, y_test = generate_data_token_counts(austen, carroll)
+X_train, y_train, X_test, y_test = generate_data_token_counts(
+    h0_documents, h1_documents
+)
 
 
 # Train Naive Bayes
-
 ph0, ph1, p0, p1 = train_naive_bayes(X_train, y_train)
 # ph0: Probability of class 0
 # ph1: Probability of class 1
@@ -157,16 +152,11 @@ print("Naive Bayes (train):", test_naive_bayes(X_train, y_train, ph0, ph1, p0, p
 print("Naive Bayes (test):", test_naive_bayes(X_test, y_test, ph0, ph1, p0, p1))
 
 # Create synthetic data:
-
-
 num_sentences = 15
 num_words_per_sentence = 7
-ph = ph0  # Austen: ph0, Carrol: ph1
-p = p0  # Austen: p0, Carrol: p1
-
 
 documents = generate_synthetic_data(
-    num_sentences, num_words_per_sentence, ph, p, vocabulary_map
+    num_sentences, num_words_per_sentence, p0, vocabulary_map
 )
 for sentence in documents:
     print(sentence)
