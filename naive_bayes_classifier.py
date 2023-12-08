@@ -129,7 +129,7 @@ def generate_synthetic_data(num_sentences, num_words_per_sentence, p, vocabulary
     return documents
 
 
-#
+# Load Data
 h0_documents = nltk.corpus.gutenberg.sents("shakespeare-hamlet.txt")
 h1_documents = nltk.corpus.gutenberg.sents("bible-kjv.txt")
 
