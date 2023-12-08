@@ -12,15 +12,4 @@ Bárbara Flores
 
 #### Introduction
 
-In this project, we will delve into document classification through various strategies. Our focus is specifically on identifying whether a document belongs to an original work by Jane Austen or if it is a fanfiction based on the author's works. Our strategies to address the problem were developed as follows:
-
-
-#### Naive Bayes Approach: Exploring Document Classification Through Generative Probabilistic Modeling
-
-In this initial stage, we will delve into the utilization of a generative probabilistic model, specifically, the Naive Bayes algorithm, to carry out this classification task. We will explore how this algorithm can effectively discern between the distinctive features of Jane Austen's original works and the creative interpretations found in fan fiction. The code developed to implement this model is located in the [naive_bayes_classifier.py](https://github.com/BarbaraPFloresRios/IDS703_NLP_NaturalLanguageProcessing_FinalProject/blob/main/naive_bayes_classifier.py) file.
-
-
-https://docs.google.com/document/d/1EORv01E7TLXM8bz2m6CcyF612Long-x7/edit
-
-
-
+The objective of this study is to classify documents, distinguishing between the Bible and Hamlet, two emblematic literary works with markedly different styles and themes. To achieve this, we will employ a generative method like Naive Bayes and a discriminative method such as a Neural Network. Our aim is to identify the distinctive patterns that characterize these works, ultimately developing a robust classifier capable of discerning the subtle differences defining the essence of the Bible and the poetic expression of Hamlet. In exploring textual crossroads, we aspire to not only contribute to a deeper understanding of the complexities that set apart these two timeless literary influences but also to comprehend the differences between these two methods of generative and discriminative classification.
