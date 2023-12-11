@@ -12,18 +12,22 @@ FloatArray = NDArray[np.float64]
 
 random.seed(43)
 nltk.data.path.append("/Users/shailaguereca/lib/nltk_data")
-austen = nltk.corpus.gutenberg.sents("austen-sense.txt")
-carroll = nltk.corpus.gutenberg.sents("carroll-alice.txt")
-# austen-emma
-# carroll-alice
-# shakespeare-hamlet
+hamlet = nltk.corpus.gutenberg.sents("shakespeare-hamlet.txt")  # Austen
+bible = nltk.corpus.gutenberg.sents("bible-kjv.txt")  # Carroll
 
-vocabulary = sorted(
-    set(token for sentence in austen + carroll for token in sentence)
-) + [None]
+# Use only the first 3106 sentences of the bible
+bible = bible[:3106]
+
+# Length of each document
+print(len(hamlet))
+print(len(bible))
+
+vocabulary = sorted(set(token for sentence in hamlet + bible for token in sentence)) + [
+    None
+]
 vocabulary_map = {token: idx for idx, token in enumerate(vocabulary)}
 
-#print(vocabulary)
+# print(vocabulary)
 
 
 def onehot(
@@ -51,7 +55,7 @@ h0_observations = [
         ),
         0,
     )
-    for sentence in austen
+    for sentence in hamlet
 ]
 h1_observations = [
     (
@@ -60,22 +64,22 @@ h1_observations = [
         ),
         1,
     )
-    for sentence in carroll
+    for sentence in bible
 ]
+
 all_data = h0_observations + h1_observations
+
 random.shuffle(all_data)
 test_percent = 10
 break_idx = round(test_percent / 100 * len(all_data))
+
 training_data = all_data[break_idx:]
 testing_data = all_data[:break_idx]
+
 X_train = [observation[0] for observation in training_data]
 y_train = [observation[1] for observation in training_data]
 X_test = [observation[0] for observation in testing_data]
 y_test = [observation[1] for observation in testing_data]
-
-# train logistic regression
-clf = LogisticRegression(random_state=0, max_iter=1000).fit(X_train, y_train)
-print("raw counts:", clf.score(X_train, y_train))
 
 # train logistic regression with TF-IDF
 tfidf = TfidfTransformer(norm=None).fit(X_train)
@@ -84,5 +88,7 @@ X_test = tfidf.transform(X_test)
 
 print("num samples:, num features:", X_train.shape)
 
-clf = LogisticRegression(random_state=0, max_iter=3000,solver='sag').fit(X_train, y_train)
+clf = LogisticRegression(random_state=0, max_iter=3000, solver="sag").fit(
+    X_train, y_train
+)
 print("tf-idf:", clf.score(X_train, y_train))
