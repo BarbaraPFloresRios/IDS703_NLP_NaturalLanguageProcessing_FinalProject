@@ -159,19 +159,17 @@ h1_documents = h1_documents[: max(len(h0_documents), len(h1_documents))]
 
 # Print information about the documents
 print("Document Information:\n")
-print("h0 = Hamlet by Shakespeare")
-print("Number of sentences in h0:", len(h0_documents))
+print(f"h0 = Hamlet by Shakespeare")
+print(f"Number of sentences in h0: {len(h0_documents):,}")
 print(
-    "Number of unique words in h0:",
-    len(set(token for sentence in h0_documents for token in sentence)),
+    f"Number of unique words in h0: {len(set(token for sentence in h0_documents for token in sentence)):,}"
 )
 print()
 
-print("h1 = Bible")
-print("Number of sentences in h1:", len(h1_documents))
+print(f"h1 = Bible")
+print(f"Number of sentences in h1: {len(h1_documents):,}")
 print(
-    "Number of unique words in h1:",
-    len(set(token for sentence in h1_documents for token in sentence)),
+    f"Number of unique words in h1: {len(set(token for sentence in h1_documents for token in sentence)):,}"
 )
 print()
 
@@ -184,7 +182,7 @@ X_train, y_train, X_test, y_test = generate_data_token_counts(
 ph0, ph1, p0, p1 = train_naive_bayes(X_train, y_train)
 
 # Test Naive Bayes
-print("Results:\n")
+print("\nResults:\n")
 print("Naive Bayes (train):", test_naive_bayes(X_train, y_train, ph0, ph1, p0, p1))
 print("Naive Bayes (test):", test_naive_bayes(X_test, y_test, ph0, ph1, p0, p1))
 print()
