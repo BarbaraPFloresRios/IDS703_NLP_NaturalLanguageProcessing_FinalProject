@@ -147,10 +147,22 @@ def test_logistic_regression_with_tfidf(X_test, y_test, clf, tfidf):
 
     # Calculate accuracy
     accuracy = sum(predictions == y_test) / len(y_test)
-
     return accuracy
 
 
+def generate_synthetic_data(num_sentences, num_words_per_sentence, p, vocabulary_map):
+    inverted_vocabulary_map = {v: k for k, v in vocabulary_map.items()}
+    documents = []
+    for i in range(num_sentences):
+        sentence = [
+            inverted_vocabulary_map[np.random.choice(len(p), p=p)]
+            for _ in range(num_words_per_sentence)
+        ]
+        documents.append(sentence)
+    return documents
+
+
+## RESULTS
 # Load Data
 h0_documents = nltk.corpus.gutenberg.sents("shakespeare-hamlet.txt")
 h1_documents = nltk.corpus.gutenberg.sents("bible-kjv.txt")[:3106]
@@ -158,7 +170,7 @@ h0_documents = h0_documents[: max(len(h0_documents), len(h1_documents))]
 h1_documents = h1_documents[: max(len(h0_documents), len(h1_documents))]
 
 # Print information about the documents
-print("Document Information:\n")
+print("DOCUMENT INFORMATION\n")
 print(f"h0 = Hamlet by Shakespeare")
 print(f"Number of sentences in h0: {len(h0_documents):,}")
 print(
@@ -182,7 +194,7 @@ X_train, y_train, X_test, y_test = generate_data_token_counts(
 ph0, ph1, p0, p1 = train_naive_bayes(X_train, y_train)
 
 # Test Naive Bayes
-print("\nResults:\n")
+print("\nRESULTS\n")
 print("Naive Bayes (train):", test_naive_bayes(X_train, y_train, ph0, ph1, p0, p1))
 print("Naive Bayes (test):", test_naive_bayes(X_test, y_test, ph0, ph1, p0, p1))
 print()
@@ -202,3 +214,15 @@ accuracy_logistic_test = test_logistic_regression_with_tfidf(
 
 print("Logistic Regression with TF-IDF (train):", accuracy_logistic_train)
 print("Logistic Regression with TF-IDF (test):", accuracy_logistic_test)
+print()
+
+# Generate Sintetic Data
+print("\nSynthetic Data:\n")
+num_sentences = 20
+num_words_per_sentence = 15
+
+documents = generate_synthetic_data(
+    num_sentences, num_words_per_sentence, p0, vocabulary_map
+)
+for sentence in documents:
+    print(sentence)
