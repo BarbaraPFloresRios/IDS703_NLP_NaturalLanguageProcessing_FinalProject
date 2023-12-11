@@ -74,7 +74,7 @@ def build_vocabulary(h0_documents, h1_documents):
     return vocabulary_map
 
 
-## 2A: Generative Probabilistic Model
+## 2A: Generative Probabilistic Model: Naive_bayes
 
 
 def train_naive_bayes(X_train, y_train):
@@ -122,7 +122,7 @@ def test_naive_bayes(X_test, y_test, ph0, ph1, p0, p1):
     return num_correct / len(y_test)
 
 
-## 2B: Generative Probabilistic Model
+## 2B: Discriminative Neural Network: Logistic Regression
 
 
 def train_logistic_regression_with_tfidf(X_train, y_train):
@@ -157,21 +157,34 @@ h1_documents = nltk.corpus.gutenberg.sents("bible-kjv.txt")[:3106]
 h0_documents = h0_documents[: max(len(h0_documents), len(h1_documents))]
 h1_documents = h1_documents[: max(len(h0_documents), len(h1_documents))]
 
+# Print information about the documents
+print("Document Information:\n")
+print("h0 = Hamlet by Shakespeare")
+print("Number of sentences in h0:", len(h0_documents))
+print(
+    "Number of unique words in h0:",
+    len(set(token for sentence in h0_documents for token in sentence)),
+)
+print()
+
+print("h1 = Bible")
+print("Number of sentences in h1:", len(h1_documents))
+print(
+    "Number of unique words in h1:",
+    len(set(token for sentence in h1_documents for token in sentence)),
+)
+print()
 
 vocabulary_map = build_vocabulary(h0_documents, h1_documents)
 X_train, y_train, X_test, y_test = generate_data_token_counts(
     h0_documents, h1_documents
 )
 
-
 # Train Naive Bayes
 ph0, ph1, p0, p1 = train_naive_bayes(X_train, y_train)
-# ph0: Probability of class 0
-# ph1: Probability of class 1
-# p0: Matrix of probabilities for each token in the vocabulary given class 0
-# p1: Matrix of probabilities for each token in the vocabulary given class 1
 
 # Test Naive Bayes
+print("Results:\n")
 print("Naive Bayes (train):", test_naive_bayes(X_train, y_train, ph0, ph1, p0, p1))
 print("Naive Bayes (test):", test_naive_bayes(X_test, y_test, ph0, ph1, p0, p1))
 print()
