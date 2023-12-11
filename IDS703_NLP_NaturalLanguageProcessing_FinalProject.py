@@ -190,6 +190,7 @@ X_train, y_train, X_test, y_test = generate_data_token_counts(
     h0_documents, h1_documents
 )
 
+
 # Train Naive Bayes
 ph0, ph1, p0, p1 = train_naive_bayes(X_train, y_train)
 
@@ -216,13 +217,105 @@ print("Logistic Regression with TF-IDF (train):", accuracy_logistic_train)
 print("Logistic Regression with TF-IDF (test):", accuracy_logistic_test)
 print()
 
+
 # Generate Sintetic Data
-print("\nSynthetic Data:\n")
-num_sentences = 20
+num_sentences = 1000
 num_words_per_sentence = 15
 
-documents = generate_synthetic_data(
+# h0: Hamlet  h1: Bible
+synthetic_data_h0 = generate_synthetic_data(
     num_sentences, num_words_per_sentence, p0, vocabulary_map
 )
-for sentence in documents:
-    print(sentence)
+synthetic_data_h1 = generate_synthetic_data(
+    num_sentences, num_words_per_sentence, p1, vocabulary_map
+)
+
+
+vocabulary_map_synthetic_data = build_vocabulary(synthetic_data_h0, synthetic_data_h1)
+(
+    X_train_synthetic_dat,
+    y_train_synthetic_dat,
+    X_test_synthetic_dat,
+    y_test_synthetic_dat,
+) = generate_data_token_counts(synthetic_data_h0, synthetic_data_h1)
+
+
+# Display information about synthetic data
+print("SYNTHETIC DATA INFORMATION\n")
+
+print(f"h0 = Synthetic Hamlet by Shakespeare")
+print(f"Number of sentences in synthetic data h0: {len(synthetic_data_h0):,}")
+print(
+    f"Number of unique words in synthetic data h0: {len(set(token for sentence in synthetic_data_h0 for token in sentence)):,}"
+)
+print()
+
+print(f"h1 = Synthetic Bible")
+print(f"Number of sentences in synthetic data h1: {len(synthetic_data_h1):,}")
+print(
+    f"Number of unique words in synthetic data h1: {len(set(token for sentence in synthetic_data_h1 for token in sentence)):,}"
+)
+print()
+
+
+print("\nSYNTHETIC RESULTS\n")
+
+
+# Train Naive Bayes on Synthetic Data
+ph0_synthetic, ph1_synthetic, p0_synthetic, p1_synthetic = train_naive_bayes(
+    X_train_synthetic_dat, y_train_synthetic_dat
+)
+
+# Test Naive Bayes on Synthetic Data
+accuracy_naive_bayes_synthetic = test_naive_bayes(
+    X_test_synthetic_dat,
+    y_test_synthetic_dat,
+    ph0_synthetic,
+    ph1_synthetic,
+    p0_synthetic,
+    p1_synthetic,
+)
+
+print(
+    "Naive Bayes on Synthetic Data (train):",
+    test_naive_bayes(
+        X_train_synthetic_dat,
+        y_train_synthetic_dat,
+        ph0_synthetic,
+        ph1_synthetic,
+        p0_synthetic,
+        p1_synthetic,
+    ),
+)
+print("Naive Bayes on Synthetic Data (test):", accuracy_naive_bayes_synthetic)
+print()
+
+# Train Logistic Regression with TF-IDF on Synthetic Data
+(
+    clf_logistic_synthetic,
+    tfidf_logistic_synthetic,
+    X_train_tfidf_synthetic,
+) = train_logistic_regression_with_tfidf(X_train_synthetic_dat, y_train_synthetic_dat)
+
+# Test Logistic Regression with TF-IDF on Synthetic Data
+accuracy_logistic_synthetic_train = test_logistic_regression_with_tfidf(
+    X_train_synthetic_dat,
+    y_train_synthetic_dat,
+    clf_logistic_synthetic,
+    tfidf_logistic_synthetic,
+)
+accuracy_logistic_synthetic_test = test_logistic_regression_with_tfidf(
+    X_test_synthetic_dat,
+    y_test_synthetic_dat,
+    clf_logistic_synthetic,
+    tfidf_logistic_synthetic,
+)
+
+print(
+    "Logistic Regression with TF-IDF on Synthetic Data (train):",
+    accuracy_logistic_synthetic_train,
+)
+print(
+    "Logistic Regression with TF-IDF on Synthetic Data (test):",
+    accuracy_logistic_synthetic_test,
+)
