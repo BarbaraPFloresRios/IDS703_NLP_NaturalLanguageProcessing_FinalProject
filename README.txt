@@ -1,0 +1,1 @@
+Requirements:numpy scikit-learn nltk tabulate ```pip install numpy scikit-learn nltk tabulate```
