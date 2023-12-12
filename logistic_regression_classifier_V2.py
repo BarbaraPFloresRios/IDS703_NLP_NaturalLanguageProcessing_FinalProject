@@ -83,12 +83,12 @@ X_train = [observation[0] for observation in training_data]
 print(X_train[:1])
 
 y_train = [observation[1] for observation in training_data]
-original_sentences_train = [
-    observation[2] for observation in training_data
-]  # Keep track of the original sentences
+original_sentences_train = [observation[2] for observation in training_data]
+# Keep track of the original sentences
 
 X_test = [observation[0] for observation in testing_data]
 y_test = [observation[1] for observation in testing_data]
+original_sentences_test = [observation[2] for observation in testing_data]
 print(y_train[:1])
 
 
@@ -179,3 +179,47 @@ plt.axis("off")
 
 plt.tight_layout()
 plt.show()
+
+
+######################################
+# TEST DATA
+
+clf = LogisticRegression(random_state=0, max_iter=3000, solver="sag").fit(
+    X_train, y_train
+)
+
+print("tf-idf:TEST", clf.score(X_test, y_test))
+
+# Assume clf is your trained classifier and X_train, y_train are your training data and labels
+y_pred2 = clf.predict(X_test)
+
+# Create confusion matrix
+cm = confusion_matrix(y_test, y_pred2)
+
+# Create a table with the confusion matrix
+table = [
+    ["", "Predicted 0", "Predicted 1"],
+    ["Actual 0", cm[0][0], cm[0][1]],
+    ["Actual 1", cm[1][0], cm[1][1]],
+]
+
+# Print the table with tabulate
+print("Confusion Matrix")
+print(tabulate(table, headers="firstrow", tablefmt="fancy_grid"))
+
+misclassified = np.where(y_test != y_pred2)
+
+# Print the misclassified sentences
+for index in misclassified[0]:
+    #    print(f"Sentence: {all_data[index]}")
+    print(f"Actual label: {y_test[index]}")
+    print(f"Predicted label: {y_pred2[index]}\n")
+
+
+# Find the misclassified sentences
+misclassified_indices = np.where(y_test != y_pred2)[0]
+misclassified_sentences = [original_sentences_test[i] for i in misclassified_indices]
+
+# Print the misclassified sentences
+for sentence in misclassified_sentences:
+    print(sentence)
