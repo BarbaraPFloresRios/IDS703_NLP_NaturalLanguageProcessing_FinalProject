@@ -6,6 +6,8 @@ import numpy as np
 from numpy.typing import NDArray
 from sklearn.feature_extraction.text import TfidfTransformer
 from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import confusion_matrix
+from tabulate import tabulate
 
 
 FloatArray = NDArray[np.float64]
@@ -100,6 +102,9 @@ def train_naive_bayes(X_train, y_train):
 
 def test_naive_bayes(X_test, y_test, ph0, ph1, p0, p1):
     num_correct = 0
+    predictions = []
+    misclassified = []
+
     for i in range(len(y_test)):
         sentence = X_test[i]
         label = y_test[i]
@@ -116,10 +121,27 @@ def test_naive_bayes(X_test, y_test, ph0, ph1, p0, p1):
         pc1 = np.exp(h1_logp)
         guess = 1 if pc1 > pc0 else 0
 
-        if guess == label:
+        predictions.append(guess)
+
+        if guess != label:
+            misclassified.append(sentence)
+
+        else:
             num_correct += 1
 
-    return num_correct / len(y_test)
+    # Calculate confusion matrix
+    cm = confusion_matrix(y_test, predictions)
+
+    # Create confusion matrix table
+    table = [
+        ["", "Predicted 0", "Predicted 1"],
+        ["Actual 0", cm[0][0], cm[0][1]],
+        ["Actual 1", cm[1][0], cm[1][1]],
+    ]
+
+    accuracy = num_correct / len(y_test)
+
+    return accuracy, table, misclassified
 
 
 ## 2B: Discriminative Neural Network: Logistic Regression
@@ -139,15 +161,40 @@ def train_logistic_regression_with_tfidf(X_train, y_train):
 
 
 def test_logistic_regression_with_tfidf(X_test, y_test, clf, tfidf):
+    num_correct = 0
+    predictions = []
+    misclassified = []
+
     # Transform X_test using TF-IDF
     X_test_tfidf = tfidf.transform(X_test)
 
     # Predict using the trained logistic regression model
     predictions = clf.predict(X_test_tfidf)
 
-    # Calculate accuracy
-    accuracy = sum(predictions == y_test) / len(y_test)
-    return accuracy
+    for i in range(len(y_test)):
+        sentence = X_test[i]
+        label = y_test[i]
+        guess = predictions[i]
+
+        if guess != label:
+            misclassified.append(sentence)
+
+        else:
+            num_correct += 1
+
+    # Calculate confusion matrix
+    cm = confusion_matrix(y_test, predictions)
+
+    # Create confusion matrix table
+    table = [
+        ["", "Predicted 0", "Predicted 1"],
+        ["Actual 0", cm[0][0], cm[0][1]],
+        ["Actual 1", cm[1][0], cm[1][1]],
+    ]
+
+    accuracy = num_correct / len(y_test)
+
+    return accuracy, table, misclassified
 
 
 def generate_synthetic_data(num_sentences, num_words_per_sentence, p, vocabulary_map):
@@ -162,6 +209,7 @@ def generate_synthetic_data(num_sentences, num_words_per_sentence, p, vocabulary
     return documents
 
 
+random.seed(43)
 ## RESULTS
 # Load Data
 h0_documents = nltk.corpus.gutenberg.sents("shakespeare-hamlet.txt")
@@ -190,15 +238,55 @@ X_train, y_train, X_test, y_test = generate_data_token_counts(
     h0_documents, h1_documents
 )
 
-
+print("_" * 50)
 # Train Naive Bayes
 ph0, ph1, p0, p1 = train_naive_bayes(X_train, y_train)
 
 # Test Naive Bayes
-print("\nRESULTS\n")
-print("Naive Bayes (train):", test_naive_bayes(X_train, y_train, ph0, ph1, p0, p1))
-print("Naive Bayes (test):", test_naive_bayes(X_test, y_test, ph0, ph1, p0, p1))
-print()
+print("\nRESULTS NAIVE BAYES\n")
+
+# Test Naive Bayes on training set
+(
+    accuracy_train_nb,
+    confusion_matrix_train_nb,
+    misclassified_sentences_train_nb,
+) = test_naive_bayes(X_train, y_train, ph0, ph1, p0, p1)
+
+# Test Naive Bayes on testing set
+(
+    accuracy_test_nb,
+    confusion_matrix_test_nb,
+    misclassified_sentences_test_nb,
+) = test_naive_bayes(X_test, y_test, ph0, ph1, p0, p1)
+
+# Accuracy
+print("Naive Bayes (train):", accuracy_train_nb)
+print("Naive Bayes (test):", accuracy_test_nb)
+
+# Print confusion matrix for Naive Bayes (Train)
+print("\nConfusion Matrix for Naive Bayes (Train)")
+print(tabulate(confusion_matrix_train_nb, headers="firstrow", tablefmt="fancy_grid"))
+
+
+# Print confusion matrix using tabulate
+print("\nConfusion Matrix for Naive Bayes (Test)")
+print(tabulate(confusion_matrix_test_nb, headers="firstrow", tablefmt="fancy_grid"))
+
+
+print("\nMisclassified Sentences for Naive Bayes (Test)\n")
+inverted_vocabulary_map = {v: k for k, v in vocabulary_map.items()}
+for sentence_embedding in misclassified_sentences_test_nb:
+    # Convert sentence embedding back to tokens
+    sentence_tokens = [
+        inverted_vocabulary_map[idx]
+        for idx, value in enumerate(sentence_embedding)
+        if value == 1
+    ]
+    print(f"- {' '.join(sentence_tokens)}")
+
+
+print("_" * 50)
+print("\n\nRESULTS LOGISTIC REGRESSION WITH TF-IDF\n")
 
 # Train Logistic Regression with TF-IDF
 clf_logistic, tfidf_logistic, X_train_tfidf = train_logistic_regression_with_tfidf(
@@ -206,16 +294,40 @@ clf_logistic, tfidf_logistic, X_train_tfidf = train_logistic_regression_with_tfi
 )
 
 # Test Logistic Regression with TF-IDF
-accuracy_logistic_train = test_logistic_regression_with_tfidf(
-    X_train, y_train, clf_logistic, tfidf_logistic
-)
-accuracy_logistic_test = test_logistic_regression_with_tfidf(
-    X_test, y_test, clf_logistic, tfidf_logistic
-)
+(
+    accuracy_train_lg,
+    confusion_matrix_train_lg,
+    misclassified_sentences_train_lg,
+) = test_logistic_regression_with_tfidf(X_train, y_train, clf_logistic, tfidf_logistic)
+(
+    accuracy_test_lg,
+    confusion_matrix_test_lg,
+    misclassified_sentences_test_lg,
+) = test_logistic_regression_with_tfidf(X_test, y_test, clf_logistic, tfidf_logistic)
 
-print("Logistic Regression with TF-IDF (train):", accuracy_logistic_train)
-print("Logistic Regression with TF-IDF (test):", accuracy_logistic_test)
-print()
+print("Logistic Regression with TF-IDF (train):", accuracy_train_lg)
+print("Logistic Regression with TF-IDF (test):", accuracy_test_lg)
+
+
+# Print confusion matrix for Logistic Regression with TF-IDF (Train)
+print("\nConfusion Matrix for Logistic Regression with TF-IDF (Train)")
+print(tabulate(confusion_matrix_train_lg, headers="firstrow", tablefmt="fancy_grid"))
+
+
+# Print confusion matrix using tabulate
+print("\nConfusion Matrix for Logistic Regression with TF-IDF (Test)")
+print(tabulate(confusion_matrix_test_lg, headers="firstrow", tablefmt="fancy_grid"))
+
+print("\nMisclassified Sentences for Logistic Regression with TF-IDF (Test)\n")
+inverted_vocabulary_map = {v: k for k, v in vocabulary_map.items()}
+for sentence_embedding in misclassified_sentences_test_lg:
+    # Convert sentence embedding back to tokens
+    sentence_tokens = [
+        inverted_vocabulary_map[idx]
+        for idx, value in enumerate(sentence_embedding)
+        if value == 1
+    ]
+    print(f"- {' '.join(sentence_tokens)}")
 
 
 # Generate Sintetic Data
@@ -241,6 +353,8 @@ vocabulary_map_synthetic_data = build_vocabulary(synthetic_data_h0, synthetic_da
 
 
 # Display information about synthetic data
+print("_" * 50)
+print("\n")
 print("SYNTHETIC DATA INFORMATION\n")
 
 print(f"h0 = Synthetic Hamlet by Shakespeare")
@@ -267,7 +381,28 @@ ph0_synthetic, ph1_synthetic, p0_synthetic, p1_synthetic = train_naive_bayes(
 )
 
 # Test Naive Bayes on Synthetic Data
-accuracy_naive_bayes_synthetic = test_naive_bayes(
+print("\nRESULTS NAIVE BAYES ON SYNTHETIC DATA\n")
+
+# Test Naive Bayes on training set (synthetic)
+(
+    accuracy_train_nb_synthetic,
+    confusion_matrix_train_nb_synthetic,
+    misclassified_sentences_train_nb_synthetic,
+) = test_naive_bayes(
+    X_train_synthetic_dat,
+    y_train_synthetic_dat,
+    ph0_synthetic,
+    ph1_synthetic,
+    p0_synthetic,
+    p1_synthetic,
+)
+
+# Test Naive Bayes on testing set (synthetic)
+(
+    accuracy_test_nb_synthetic,
+    confusion_matrix_test_nb_synthetic,
+    misclassified_sentences_test_nb_synthetic,
+) = test_naive_bayes(
     X_test_synthetic_dat,
     y_test_synthetic_dat,
     ph0_synthetic,
@@ -276,19 +411,35 @@ accuracy_naive_bayes_synthetic = test_naive_bayes(
     p1_synthetic,
 )
 
+# Accuracy
+print("Naive Bayes on Synthetic Data (train):", accuracy_train_nb_synthetic)
+print("Naive Bayes on Synthetic Data (test):", accuracy_test_nb_synthetic)
+
+# Print confusion matrix for Naive Bayes on Synthetic Data (Train)
+print("\nConfusion Matrix for Naive Bayes on Synthetic Data (Train)")
 print(
-    "Naive Bayes on Synthetic Data (train):",
-    test_naive_bayes(
-        X_train_synthetic_dat,
-        y_train_synthetic_dat,
-        ph0_synthetic,
-        ph1_synthetic,
-        p0_synthetic,
-        p1_synthetic,
-    ),
+    tabulate(
+        confusion_matrix_train_nb_synthetic, headers="firstrow", tablefmt="fancy_grid"
+    )
 )
-print("Naive Bayes on Synthetic Data (test):", accuracy_naive_bayes_synthetic)
-print()
+
+# Print confusion matrix for Naive Bayes on Synthetic Data (Test)
+print("\nConfusion Matrix for Naive Bayes on Synthetic Data (Test)")
+print(
+    tabulate(
+        confusion_matrix_test_nb_synthetic, headers="firstrow", tablefmt="fancy_grid"
+    )
+)
+
+print("\nMisclassified Sentences for Naive Bayes on Synthetic Data (Test)\n")
+for sentence_embedding in misclassified_sentences_test_nb_synthetic:
+    # Convert sentence embedding back to tokens
+    sentence_tokens = [
+        inverted_vocabulary_map[idx]
+        for idx, value in enumerate(sentence_embedding)
+        if value == 1
+    ]
+    print(f"- {' '.join(sentence_tokens)}")
 
 # Train Logistic Regression with TF-IDF on Synthetic Data
 (
@@ -298,24 +449,66 @@ print()
 ) = train_logistic_regression_with_tfidf(X_train_synthetic_dat, y_train_synthetic_dat)
 
 # Test Logistic Regression with TF-IDF on Synthetic Data
-accuracy_logistic_synthetic_train = test_logistic_regression_with_tfidf(
+(
+    accuracy_train_lg_synthetic,
+    confusion_matrix_train_lg_synthetic,
+    misclassified_sentences_train_lg_synthetic,
+) = test_logistic_regression_with_tfidf(
     X_train_synthetic_dat,
     y_train_synthetic_dat,
     clf_logistic_synthetic,
     tfidf_logistic_synthetic,
 )
-accuracy_logistic_synthetic_test = test_logistic_regression_with_tfidf(
+
+(
+    accuracy_test_lg_synthetic,
+    confusion_matrix_test_lg_synthetic,
+    misclassified_sentences_test_lg_synthetic,
+) = test_logistic_regression_with_tfidf(
     X_test_synthetic_dat,
     y_test_synthetic_dat,
     clf_logistic_synthetic,
     tfidf_logistic_synthetic,
 )
 
+print("\nRESULTS LOGISTIC REGRESSION WITH TF-IDF ON SYNTHETIC DATA\n")
+
+# Accuracy
 print(
     "Logistic Regression with TF-IDF on Synthetic Data (train):",
-    accuracy_logistic_synthetic_train,
+    accuracy_train_lg_synthetic,
 )
 print(
     "Logistic Regression with TF-IDF on Synthetic Data (test):",
-    accuracy_logistic_synthetic_test,
+    accuracy_test_lg_synthetic,
 )
+
+# Print confusion matrix for Logistic Regression with TF-IDF on Synthetic Data (Train)
+print(
+    "\nConfusion Matrix for Logistic Regression with TF-IDF on Synthetic Data (Train)"
+)
+print(
+    tabulate(
+        confusion_matrix_train_lg_synthetic, headers="firstrow", tablefmt="fancy_grid"
+    )
+)
+
+# Print confusion matrix for Logistic Regression with TF-IDF on Synthetic Data (Test)
+print("\nConfusion Matrix for Logistic Regression with TF-IDF on Synthetic Data (Test)")
+print(
+    tabulate(
+        confusion_matrix_test_lg_synthetic, headers="firstrow", tablefmt="fancy_grid"
+    )
+)
+
+print(
+    "\nMisclassified Sentences for Logistic Regression with TF-IDF on Synthetic Data (Test)\n"
+)
+for sentence_embedding in misclassified_sentences_test_lg_synthetic:
+    # Convert sentence embedding back to tokens
+    sentence_tokens = [
+        inverted_vocabulary_map[idx]
+        for idx, value in enumerate(sentence_embedding)
+        if value == 1
+    ]
+    print(f"- {' '.join(sentence_tokens)}")
