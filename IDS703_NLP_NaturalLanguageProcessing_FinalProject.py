@@ -1,4 +1,8 @@
-"""Compare token/document vectors for classification."""
+# Barbara Flores
+# Daniela Jimenez
+# Shaila Guereca
+
+
 import random
 from typing import Mapping, Optional, Sequence
 import nltk
@@ -69,9 +73,11 @@ def generate_data_token_counts(
 
 
 def build_vocabulary(h0_documents, h1_documents):
-    vocabulary = sorted(
-        set(token for sentence in h0_documents + h1_documents for token in sentence)
-    ) + [None]
+    vocabulary_set = set(
+        token for sentence in h0_documents + h1_documents for token in sentence
+    )
+    vocabulary_set.discard(None)
+    vocabulary = sorted(vocabulary_set) + [None]
     vocabulary_map = {token: idx for idx, token in enumerate(vocabulary)}
     return vocabulary_map
 
