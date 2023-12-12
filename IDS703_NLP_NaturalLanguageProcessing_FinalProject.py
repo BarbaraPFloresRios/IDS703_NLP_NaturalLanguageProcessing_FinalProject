@@ -209,7 +209,7 @@ def generate_synthetic_data(num_sentences, num_words_per_sentence, p, vocabulary
     return documents
 
 
-random.seed(43)
+random.seed(47)
 ## RESULTS
 # Load Data
 h0_documents = nltk.corpus.gutenberg.sents("shakespeare-hamlet.txt")
@@ -371,7 +371,7 @@ print(
 )
 print()
 
-
+print("_" * 50)
 print("\nSYNTHETIC RESULTS\n")
 
 
@@ -470,7 +470,7 @@ for sentence_embedding in misclassified_sentences_test_nb_synthetic:
     clf_logistic_synthetic,
     tfidf_logistic_synthetic,
 )
-
+print("_" * 50)
 print("\nRESULTS LOGISTIC REGRESSION WITH TF-IDF ON SYNTHETIC DATA\n")
 
 # Accuracy
